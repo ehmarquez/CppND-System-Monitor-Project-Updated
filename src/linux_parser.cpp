@@ -68,8 +68,8 @@ vector<int> LinuxParser::Pids() {
 }
 
 float LinuxParser::MemoryUtilization() {
-  string line, key, value;
-  float memTotal, memFree;
+  string line, key;
+  float memTotal, memFree, value;
   std::ifstream filestream(kProcDirectory + kMeminfoFilename);
   if (filestream.is_open()) {
     // Parse the first 4 lines only
@@ -79,9 +79,9 @@ float LinuxParser::MemoryUtilization() {
       std::istringstream linestream(line);
       while (linestream >> key >> value) {
         if (key == "MemTotal:") {
-          memTotal = std::stoi(value);
+          memTotal = value;
         } else if (key == "MemFree:") {
-          memFree = std::stoi(value);
+          memFree = value;
         }
       }
     }
@@ -92,14 +92,14 @@ float LinuxParser::MemoryUtilization() {
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() {
-  string line, uptime_str;
+  string line;
   long uptime = 0;
   std::ifstream filestream(kProcDirectory + kUptimeFilename);
   if (filestream.is_open()) {
     std::getline(filestream, line);
     std::istringstream linestream(line);
-    linestream >> uptime_str;
-    return std::stol(uptime_str);
+    linestream >> uptime;
+    return uptime;
   }
   return uptime;
 }
