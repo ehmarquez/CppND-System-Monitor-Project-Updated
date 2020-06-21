@@ -90,7 +90,7 @@ float LinuxParser::MemoryUtilization() {
   return (memTotal - memFree) / memTotal;
 }
 
-// TODO: Read and return the system uptime
+// Read and return the system uptime
 long LinuxParser::UpTime() {
   string line;
   long uptime = 0;
