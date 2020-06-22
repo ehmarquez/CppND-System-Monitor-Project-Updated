@@ -29,6 +29,7 @@ vector<Process>& System::Processes() {
   for (auto it = pids.begin(); it != pids.end(); ++it) {
     processes_.push_back(Process(*it));
   }
+
   return processes_; }
 
 // Return the system's kernel identifier (string)
