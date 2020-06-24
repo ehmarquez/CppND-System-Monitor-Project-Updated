@@ -27,14 +27,7 @@ class Process {
   float clock_hz_;
   std::vector<std::string> stats_;
 
-  enum PIDStats {
-    kUtime_ = 13,
-    kStime_,
-    kCutime_,
-    kCstime_,
-    kStarttime_ = 21
-  };
-
+  
 };
 
 

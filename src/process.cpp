@@ -25,7 +25,7 @@ Process::Process(int pid)
 // TODO: Return this process's ID
 int Process::Pid() { return pid_; }
 
-// TODO: Return this process's CPU utilization
+// Return this process's CPU utilization
 float Process::CpuUtilization() {
   string line;
   float total_time = 0, seconds = 0;
@@ -39,11 +39,13 @@ float Process::CpuUtilization() {
     /* Calculate CPU usage per process using
      * https://stackoverflow.com/questions/16726779/
      */
-    total_time = std::stof(stats_.at(kUtime_)) + std::stof(stats_.at(kStime_)) +
-                 std::stof(stats_.at(kCutime_)) +
-                 std::stof(stats_.at(kCstime_));
+    total_time = std::stof(stats_.at(LinuxParser::PIDStats::kUtime_)) +
+                 std::stof(stats_.at(LinuxParser::PIDStats::kStime_)) +
+                 std::stof(stats_.at(LinuxParser::PIDStats::kCutime_)) +
+                 std::stof(stats_.at(LinuxParser::PIDStats::kCstime_));
     seconds =
-        LinuxParser::UpTime() - (std::stof(stats_.at(kStarttime_)) / clock_hz_);
+        LinuxParser::UpTime() -
+        (std::stof(stats_.at(LinuxParser::PIDStats::kStarttime_)) / clock_hz_);
   }
 
   // Store values into class members for updates
@@ -52,50 +54,22 @@ float Process::CpuUtilization() {
   return cpu_;
 }
 
-// TODO: Return the command that generated this process
-string Process::Command() {
-  string line;
-  std::ifstream filestream(LinuxParser::kProcDirectory + std::to_string(pid_) +
-                           LinuxParser::kCmdlineFilename);
-  if (filestream.is_open()) {
-    std::getline(filestream, line);
-  }
-
-  return line;
-}
+// Return the command that generated this process
+string Process::Command() { return LinuxParser::Command(pid_); }
 
 // Return this process's memory utilization
 string Process::Ram() {
-  string line, key, value;
-
-  std::ifstream filestream(LinuxParser::kProcDirectory + to_string(pid_) +
-                           LinuxParser::kStatusFilename);
-  if (filestream.is_open()) {
-    while (std::getline(filestream, line)) {
-      std::istringstream linestream(line);
-      while (linestream >> key >> value) {
-        if (key == "VmSize:") {
-          mem_ = (int)(stof(value) / 1000.0);
-          break;
-        }
-      }
-    }
-  }
-
-  // Pad spaces at the end to clear previous chars
-  if (to_string(mem_).length() < 5) {
-  }
-
-  return to_string(mem_) + "M";
+  mem_ = (int)(stof(LinuxParser::Ram(pid_)) / 1000.0);
+  return to_string(mem_) + "M\n";
 }
 
-// TODO: Return the user (name) that generated this process
-string Process::User() { return string(); }
+// Return the user (name) that generated this process
+string Process::User() { return LinuxParser::User(LinuxParser::Uid(pid_)); }
 
 // TODO: Return the age of this process (in seconds)
 long int Process::UpTime() {
-  return (long int)(stof(stats_.at(kStarttime_)) / sysconf(_SC_CLK_TCK));
+  return (long int)(stof(stats_.at(LinuxParser::PIDStats::kStarttime_)) / sysconf(_SC_CLK_TCK));
 }
 
 // TODO: Overload the "less than" comparison operator for Process objects
-bool Process::operator<(Process const& a) const { return cpu_ < a.cpu_; }
+bool Process::operator<(Process const& a) const { return a.cpu_ < cpu_; }
