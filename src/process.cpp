@@ -1,4 +1,7 @@
+#include "process.h"
+
 #include <unistd.h>
+
 #include <cctype>
 #include <iostream>
 #include <sstream>
@@ -6,7 +9,6 @@
 #include <vector>
 
 #include "linux_parser.h"
-#include "process.h"
 
 using std::string;
 using std::to_string;
@@ -14,6 +16,7 @@ using std::vector;
 
 // Constructor for assigning unique PID
 Process::Process(int pid)
+
     : pid_(0),
       cpu_(0),
       mem_(0),
@@ -59,7 +62,7 @@ string Process::Command() { return LinuxParser::Command(pid_); }
 
 // Return this process's memory utilization
 string Process::Ram() {
-  mem_ = (int)(stof(LinuxParser::Ram(pid_)) / 1000.0);
+  mem_ = (int)(stof(LinuxParser::Ram(pid_)) / 1024.0);
   return to_string(mem_) + "M\n";
 }
 
@@ -67,9 +70,7 @@ string Process::Ram() {
 string Process::User() { return LinuxParser::User(LinuxParser::Uid(pid_)); }
 
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() {
-  return (long int)(stof(stats_.at(LinuxParser::PIDStats::kStarttime_)) / sysconf(_SC_CLK_TCK));
-}
+long int Process::UpTime() { return (long int)LinuxParser::UpTime(pid_); }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 bool Process::operator<(Process const& a) const { return a.cpu_ < cpu_; }

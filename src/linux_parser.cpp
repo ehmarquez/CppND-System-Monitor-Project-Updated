@@ -1,10 +1,11 @@
+#include "linux_parser.h"
+
 #include <dirent.h>
 #include <unistd.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
-
-#include "linux_parser.h"
 
 using std::stof;
 using std::string;
@@ -110,7 +111,7 @@ long LinuxParser::Jiffies() { return 0; }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid [[maybe_unused]]) { return 0; }
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
@@ -233,14 +234,13 @@ string LinuxParser::User(string uid_input) {
 long LinuxParser::UpTime(int pid) {
   string line;
   vector<string> stats;
-  std::ifstream stream(kProcDirectory + std::to_string(pid) +
-                       kStatFilename);
+  std::ifstream stream(kProcDirectory + std::to_string(pid) + kStatFilename);
   if (stream.is_open()) {
     std::getline(stream, line);
     std::istringstream linestream(line);
     stats.assign(std::istream_iterator<string>{linestream},
-                  std::istream_iterator<string>{});
-    return (long)(stof(stats.at(kUtime_)) / sysconf(_SC_CLK_TCK));
+                 std::istream_iterator<string>{});
+    return UpTime() - (stof(stats.at(kStarttime_)) / sysconf(_SC_CLK_TCK));
   }
   return 0;
 }
